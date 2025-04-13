@@ -16,22 +16,32 @@ public class Product {
         this.shopName = shopName;
     }
 
-    public void add() {
+    public boolean add() {
         Scanner scanner = new Scanner(System.in);
 
-        Printer.printLine("####### 상품 등록 페이지에 접속했습니다. #######");
-        Printer.printLine("");
+        Printer.printHashHeader("🆕", "상품 등록 페이지");
+        Printer.printBoldLine();
+        Printer.select("등록할 상품의 이름을 입력해주세요");
 
-        Printer.prompt("등록할 상품의 이름을 입력해주세요: ");
-        this.prodName = scanner.nextLine();
+        try {
+            this.prodName = scanner.nextLine();
+            Printer.select("[ " + this.prodName + " ]" + "의 가격(원)을 입력해주세요");
+            this.prodPrice = Long.parseLong(scanner.nextLine());
 
-        Printer.prompt(this.prodName + "의 가격(원)을 입력해주세요: ");
-        this.prodPrice = Long.parseLong(scanner.nextLine());
+            Printer.select("[ " + this.prodName + " ]" + "의 수량을 입력해주세요");
+            this.prodQuantity = Long.parseLong(scanner.nextLine());
 
-        Printer.prompt(this.prodName + "의 수량을 입력해주세요: ");
-        this.prodQuantity = Long.parseLong(scanner.nextLine());
+            if (this.prodPrice <= 0 || this.prodQuantity <= 0) {
+                Printer.error("가격과 수량은 0보다 커야 합니다. 상품 등록 실패.");
+                return false;
+            }
 
-        Printer.printLine("############## 상품 등록 완료 ###############");
-        Printer.printLine("");
+        } catch (NumberFormatException e) {
+            Printer.error("숫자 형식이 올바르지 않습니다. 상품 등록 실패.");
+            return false;
+        }
+        Printer.printBoldLine();
+        Printer.printHash();
+        return true;
     }
 }

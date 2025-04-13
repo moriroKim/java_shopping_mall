@@ -17,41 +17,45 @@ public class User {
 
     public void SignUp() {
         Scanner scanner = new Scanner(System.in);
+        String[] icons = {"😊", "🧑‍💼", "🚪"};
+        String[] options = {"구매자 : 1", "판매자 : 2", "나가기 : q"};
 
         while (true) {
-            Printer.printLine("######### 회원가입 페이지 #########");
-            Printer.printLine("");
-            Printer.printLine("계정 타입 선택 (1: 구매자 / 2: 판매자 / q: 현재 페이지 나가기)");
-
-            Printer.prompt("타입: ");
+            Printer.printHashHeader("👤", "회원가입 페이지");
+            Printer.printBoldLine();
+            Printer.printLine();
+            Printer.printOptions(icons, options, true);
+            Printer.select("가입유형");
             String tempStr = scanner.nextLine();
+            Printer.printBoldLine();
+            Printer.printHash();
 
             if (!(tempStr.equals("1") || tempStr.equals("2") || tempStr.equals("q"))) {
-                Printer.printLine("잘못된 입력값입니다!");
+                Printer.error("잘못된 입력값입니다!");
                 continue;
             }
 
             if (tempStr.equals("q")) {
-                Printer.printLine("회원가입 페이지를 종료합니다.");
+                Printer.quitMsg("회원가입 페이지를 종료합니다.");
                 break;
             }
 
             this.userType = tempStr;
 
-            Printer.prompt("아이디: ");
+            Printer.select("아이디🪪");
             tempStr = scanner.nextLine();
             this.userId = tempStr;
 
-            Printer.prompt("비밀번호: ");
+            Printer.select("비밀번호🔐");
             tempStr = scanner.nextLine();
             this.password = tempStr;
 
             if (this.userType.equals("2")) {
                 // 판매자일 경우 상점 정보 입력
-                Printer.print("%s님의 상점 이름을 입력해주세요: ", this.userId);
+                Printer.select("[ " + this.userId + " ]" + "님의 상점 이름을 입력해주세요");
                 this.shopName = scanner.nextLine();
                 this.shopId = UUID.randomUUID().toString(); // 상점 ID 생성
-                Printer.print("%s님의 [%s] 개설 및 회원가입 진행중...\n", this.userId, this.shopName);
+                Printer.loadingMsg(this.userId, this.shopName, "개설중");
             }
 
             // User 객체 생성 후 UserDB에 추가
@@ -78,8 +82,7 @@ public class User {
                 this.password = "";
             } else {
                 String currUserType = isUserExist.userType.equals("1") ? "구매자" : "판매자";
-                Printer.success("");
-                Printer.print("[%s]%s님, 회원가입이 완료되었습니다\n", currUserType, isUserExist.userId);
+                Printer.systemMsg(currUserType, isUserExist.userId, "회원가입이 완료되었습니다!");
                 break;
             }
         }
@@ -87,20 +90,26 @@ public class User {
 
     public User SignIn() {
         Scanner scanner = new Scanner(System.in);
+        String[] options = {"종료: q"};
+        String[] icons = {"🚪"};
 
         while (true) {
-            Printer.printLine("######### 로그인 페이지 #########");
-            Printer.printLine("로그인을 종료하려면 'q'를 입력하세요.");
+            Printer.printHashHeader("🔒", "로그인 페이지");
+            Printer.printLine();
+            Printer.printOptions(icons, options, true);
+            Printer.printLine();
+            Printer.printBoldLine();
+            Printer.printHash();
 
-            Printer.prompt("아이디: ");
+            Printer.select("아이디🪪");
             String inputId = scanner.nextLine();
 
             if (inputId.equals("q")) {
-                Printer.printLine("로그인을 종료합니다.");
+                Printer.quitMsg("로그인을 종료합니다");
                 return null;
             }
 
-            Printer.prompt("비밀번호: ");
+            Printer.select("비밀번호🔐");
             String inputPw = scanner.nextLine();
 
             User foundUser = this.userDB.findUserById(inputId);
@@ -116,8 +125,7 @@ public class User {
             }
 
             String currUserType = foundUser.userType.equals("1") ? "구매자" : "판매자";
-            Printer.success("");
-            Printer.print("[%s]%s님, 로그인에 성공하였습니다!\n", foundUser.userId, currUserType);
+            Printer.systemMsg(currUserType, foundUser.userId, "로그인에 성공했습니다!");
 
             return foundUser;
         }

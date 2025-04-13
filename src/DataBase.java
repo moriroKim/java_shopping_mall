@@ -49,7 +49,7 @@ public class DataBase {
             for (int i = 0; i < dbIdx; i++) {
                 Product p = db[i];
                 if (p != null && p.ownerId.equals(ownerId)) {
-                    Printer.print("상품ID: %s | %s - %d원 | 수량: %d", p.PROD_ID, p.prodName, p.prodPrice, p.prodQuantity);
+                    Printer.printProduct(p, i);
                 }
             }
         }
@@ -65,9 +65,9 @@ public class DataBase {
         public void updateByOwner() {
             Product[] tempForPrint = new Product[dbIdx];
 
-            Printer.print("########### 상품 수정 페이지 ############");
-            Printer.line();
-            Printer.prompt("수정하고 싶은 상품 아이디 또는 이름: ");
+            Printer.printHashHeader("🔧", "상품 수정");
+            Printer.space(false);
+            Printer.select("상품 id or 이름");
             String targetId = scanner.nextLine();
 
             boolean found = false;
@@ -75,7 +75,7 @@ public class DataBase {
                 Product p = db[i];
                 if (p != null && (p.PROD_ID.equals(targetId) || p.prodName.equals(targetId))) {
                     tempForPrint[i] = p;
-                    Printer.print("[%d][✅] 상품ID: %s | %s - %d원 | 수량: %d", i, p.PROD_ID, p.prodName, p.prodPrice, p.prodQuantity);
+                    Printer.printProduct(p, i);
                     found = true;
                 }
             }
@@ -86,7 +86,10 @@ public class DataBase {
             }
 
             while (true) {
-                Printer.prompt("어떤 상품을 수정하시겠습니까? (index 입력 / q: 종료) : ");
+                String[] options = {"수정 : 번호입력", "종료 : q"};
+                String[] ico = {"🔧", "❌"};
+                Printer.printOptions(ico, options, true);
+                Printer.select("선택");
                 String inputValue = scanner.nextLine();
                 if (inputValue.equals("q")) break;
 
@@ -102,44 +105,54 @@ public class DataBase {
                     Product p = tempForPrint[targetIdx];
                     boolean isEdited = false;
 
+                    label:
                     while (true) {
-                        String editStatus = isEdited ? "[🔧수정됨]" : "[✅]";
-                        Printer.print("%s : [%s] %s : %d원 | %d개", editStatus, p.PROD_ID, p.prodName, p.prodPrice, p.prodQuantity);
-                        Printer.print("1 : 상품명 수정 / 2 : 가격 수정 / 3 : 수량 수정 / q : 종료");
-                        Printer.prompt("선택: ");
+                        String editStatus = isEdited ? "🔧" : "📌";
+                        String[] editOptions = {"상품명 수정", "가격 수정", "수량 수정"};
+
+                        Printer.customMsg(editStatus, isEdited ? "수정됨" : "");
+                        Printer.printProduct(p, targetIdx);
+                        Printer.printOptions(null, editOptions, false);
+
+                        Printer.select("선택");
                         String choice = scanner.nextLine();
 
-                        if (choice.equals("1")) {
-                            Printer.prompt("새 상품명: ");
-                            String newName = scanner.nextLine();
-                            sinkDB(p.PROD_ID, "name", newName);
-                            Printer.success("상품명이 수정되었습니다.");
-                            isEdited = true;
-                        } else if (choice.equals("2")) {
-                            Printer.prompt("새 가격: ");
-                            try {
-                                long newPrice = Long.parseLong(scanner.nextLine());
-                                sinkDB(p.PROD_ID, "price", newPrice);
-                                Printer.success("가격이 수정되었습니다.");
+                        switch (choice) {
+                            case "1":
+                                Printer.select("상품명 변경");
+                                String newName = scanner.nextLine();
+                                sinkDB(p.PROD_ID, "name", newName);
+                                Printer.success("상품명이 수정되었습니다.");
                                 isEdited = true;
-                            } catch (Exception e) {
-                                Printer.error("숫자를 입력해주세요.");
-                            }
-                        } else if (choice.equals("3")) {
-                            Printer.prompt("새 수량: ");
-                            try {
-                                long newQty = Long.parseLong(scanner.nextLine());
-                                sinkDB(p.PROD_ID, "quantity", newQty);
-                                Printer.success("수량이 수정되었습니다.");
-                                isEdited = true;
-                            } catch (Exception e) {
-                                Printer.error("숫자를 입력해주세요.");
-                            }
-                        } else if (choice.equals("q")) {
-                            Printer.print("상품 수정 종료.");
-                            break;
-                        } else {
-                            Printer.error("잘못된 선택입니다.");
+                                break;
+                            case "2":
+                                Printer.select("가격 변경");
+                                try {
+                                    long newPrice = Long.parseLong(scanner.nextLine());
+                                    sinkDB(p.PROD_ID, "price", newPrice);
+                                    Printer.success("가격이 수정되었습니다.");
+                                    isEdited = true;
+                                } catch (Exception e) {
+                                    Printer.error("숫자를 입력해주세요.");
+                                }
+                                break;
+                            case "3":
+                                Printer.select("수량 변경");
+                                try {
+                                    long newQty = Long.parseLong(scanner.nextLine());
+                                    sinkDB(p.PROD_ID, "quantity", newQty);
+                                    Printer.success("수량이 수정되었습니다.");
+                                    isEdited = true;
+                                } catch (Exception e) {
+                                    Printer.error("숫자를 입력해주세요.");
+                                }
+                                break;
+                            case "4":
+                                Printer.quitMsg("상품 수정 종료");
+                                break label;
+                            default:
+                                Printer.error("잘못된 선택입니다.");
+                                break;
                         }
                     }
                 } else {
@@ -238,13 +251,16 @@ public class DataBase {
 
         public void showOrdersByShop(String shopId) {
             int orderCnt = 0;
-            for (Order o : db) {
+            for (int i = 0; i < dbIdx; i++) {
+                Order o = db[i];
                 if (o != null && o.shopId.equals(shopId)) {
                     orderCnt++;
                     o.show();
                 }
             }
-            Printer.print("총 주문 건 : %d건", orderCnt);
+
+            String msg = "총 주문 건 : " + orderCnt + "건";
+            Printer.customMsg("📋", msg);
         }
     }
 }

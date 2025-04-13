@@ -14,20 +14,20 @@ public class App {
 
     public void run() {
         while (true) {
-            Printer.printLine("\n" +
+            System.out.print("\n" +
                     "┌────────────────────────────────────┐\n" +
                     "│   🛍️  Welcome to Shopping Mall     │\n" +
                     "└────────────────────────────────────┘");
-            Printer.printLine(""); // 빈 줄 출력
-            Printer.printLine("1️⃣  로그인");
-            Printer.printLine("2️⃣  회원가입");
-            Printer.printLine("❌  q: 접속 종료");
-            Printer.prompt("\n👉 선택: ");
+            System.out.println();
+            String[] options = {"로그인", "회원가입", "프로그램 종료"};
+            Printer.printOptions(null, options, false);
+            Printer.select("선택");
 
             String tempStr = scanner.nextLine();
-
-            if (tempStr.equals("q")) {
-                Printer.printLine("\n👋 접속을 종료합니다. 다음에 또 만나요!");
+            if (tempStr.equals("3")) {
+                Printer.printBoldLine();
+                Printer.systemMsg(currentUser.userType, currentUser.userId, "다음에 또 만나요! 👋");
+                Printer.printBoldLine();
                 return;
             }
 
@@ -48,7 +48,7 @@ public class App {
                     break;
 
                 default:
-                    Printer.printLine("\n🚫 올바른 메뉴를 선택해주세요.\n");
+                    Printer.error("올바른 메뉴를 선택해주세요!");
             }
         }
     }
@@ -56,9 +56,9 @@ public class App {
     private void showMenu(User user) {
         menu = new Menu(db.productDB, db.shopDB, db.orderDB, user);
         if (user.userType.equals("2")) {
-            menu.showSellerMenu(user);
+            menu.showSellerMenu();
         } else {
-            menu.showUserMenu(user);
+            menu.showUserMenu();
         }
     }
 }
