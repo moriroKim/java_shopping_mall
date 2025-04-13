@@ -3,16 +3,15 @@ import java.util.UUID;
 
 public class Product {
     final String PROD_ID = UUID.randomUUID().toString();
+    String shopId = ""; // 소속된 상점 ID
     String ownerId = ""; // 판매자 ID
     String prodName = "";
-    int prodPrice = 0;
-    int prodQuantity = 0;
+    long prodPrice = 0;
+    long prodQuantity = 0;
 
-    Product(String ownerId, String prodName, int prodPrice, int prodQuantity) {
+    Product(String shopId, String ownerId) {
+        this.shopId = shopId;
         this.ownerId = ownerId;
-        this.prodName = prodName;
-        this.prodPrice = prodPrice;
-        this.prodQuantity = prodQuantity;
     }
 
     public void add() {
@@ -25,10 +24,10 @@ public class Product {
         this.prodName = scanner.nextLine();
 
         System.out.print(this.prodName + "의 가격(원)을 입력해주세요: ");
-        this.prodPrice = Integer.parseInt(scanner.nextLine());
+        this.prodPrice = Long.parseLong(scanner.nextLine());
 
         System.out.print(this.prodName + "의 수량을 입력해주세요: ");
-        this.prodQuantity = Integer.parseInt(scanner.nextLine());
+        this.prodQuantity = Long.parseLong(scanner.nextLine());
 
         System.out.println("############## 상품 등록 완료 ###############");
         System.out.println();

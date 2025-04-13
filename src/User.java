@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.Scanner;
 import java.util.UUID;
 
@@ -10,9 +11,9 @@ public class User {
     String userId = "";
     String password = "";
 
-    User(DataBase.UserDB userDB) {
+    User(DataBase.UserDB userDB, DataBase.ShopDB shopDB) {
         this.userDB = userDB;
-        this.shopDB = new DataBase.ShopDB();
+        this.shopDB = shopDB;
     }
 
     public void SignUp() {
@@ -47,30 +48,44 @@ public class User {
             this.password = tempStr;
 
             if (this.userType.equals("2")) {
+                // 판매자일 경우 상점 정보 입력
                 System.out.printf("%s님의 상점 이름을 입력해주세요: ", this.userId);
                 this.shopName = scanner.nextLine();
-                this.shopId = UUID.randomUUID().toString();
-                System.out.printf("%s님의 [%s]개설 및 회원가입 진행중...", this.userId, this.shopName);
+                this.shopId = UUID.randomUUID().toString(); // 상점 ID 생성
+                System.out.printf("%s님의 [%s] 개설 및 회원가입 진행중...\n", this.userId, this.shopName);
             }
 
-            this.userDB.addUser(this);
-            Shop shop = new Shop(this);
-            this.shopDB.addShop(shop);
-            User isUserExist = this.userDB.isUserExist(this);
+            // User 객체 생성 후 UserDB에 추가
+            User newUser = new User(this.userDB, this.shopDB);
+            newUser.userId = this.userId;
+            newUser.userType = this.userType;
+            newUser.password = this.password;
+            newUser.shopId = this.shopId;  // 상점 ID를 User에 설정
+
+            this.userDB.addUser(newUser);
+
+            if (this.userType.equals("2")) {
+                // 판매자일 경우 상점도 등록
+                Shop shop = new Shop(this.shopId, this.shopName, newUser.userId);
+                this.shopDB.addShop(shop);
+            }
+
+            User isUserExist = this.userDB.isUserExist(newUser);
 
             if (isUserExist == null) {
                 System.out.println("회원가입에 실패했습니다!");
                 this.userType = "";
                 this.userId = "";
                 this.password = "";
+                continue;
             } else {
                 String currUserType = isUserExist.userType.equals("1") ? "구매자" : "판매자";
                 System.out.printf("[%s]%s님, 회원가입이 완료되었습니다\n", currUserType, isUserExist.userId);
                 break;
             }
         }
-
     }
+
     public User SignIn() {
         Scanner scanner = new Scanner(System.in);
 
@@ -107,6 +122,4 @@ public class User {
             return foundUser;
         }
     }
-
-
 }

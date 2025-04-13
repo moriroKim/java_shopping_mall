@@ -1,10 +1,10 @@
 public class Cart {
 
     Product[] products = new Product[100];
-    int[] quantity = new int[products.length];
-    int totalPrice = 0;
+    long[] quantity = new long[products.length];
+    long totalPrice = 0;
 
-    public void addCart(Product product, int quantity) {
+    public void addCart(Product product, long quantity) {
         for (int i = 0; i < products.length; i++) {
             if (products[i] == null) {
                 products[i] = product;
@@ -15,6 +15,7 @@ public class Cart {
     }
 
     public void calcTotalPrice() {
+        totalPrice = 0; // 누적 방지를 위해 초기화
         for (int i = 0; i < products.length; i++) {
             if (products[i] != null) {
                 totalPrice += products[i].prodPrice * quantity[i];
@@ -22,5 +23,15 @@ public class Cart {
                 break;
             }
         }
+    }
+
+    public void empty() {
+        this.products = new Product[100];
+        this.quantity = new long[products.length];
+        this.totalPrice = 0;
+    }
+
+    public long[] getQuantity() {
+        return this.quantity;
     }
 }
