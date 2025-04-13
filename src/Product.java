@@ -4,14 +4,16 @@ import java.util.UUID;
 public class Product {
     final String PROD_ID = UUID.randomUUID().toString();
     String shopId = ""; // 소속된 상점 ID
+    String shopName = ""; // 소속된 상점 이름
     String ownerId = ""; // 판매자 ID
     String prodName = "";
     long prodPrice = 0;
     long prodQuantity = 0;
 
-    Product(String shopId, String ownerId) {
+    Product(String shopId, String ownerId, String shopName) {
         this.shopId = shopId;
         this.ownerId = ownerId;
+        this.shopName = shopName;
     }
 
     public void add() {

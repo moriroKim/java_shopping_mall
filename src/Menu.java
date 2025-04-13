@@ -67,7 +67,7 @@ public class Menu {
                     prodDB.showByOwner(currentShop.ownerId);
                     break;
                 case "2":
-                    Product newProduct = new Product(currentShop.shopId, currentShop.ownerId);
+                    Product newProduct = new Product(currentShop.shopId, currentShop.ownerId, currentShop.shopName);
                     newProduct.add();
                     this.prodDB.addByOwner(newProduct);
                     break;
@@ -102,7 +102,7 @@ public class Menu {
             Product product = this.prodDB.db[i];
             if (product != null) {
                 hasProduct = true;
-                System.out.printf("[%d] %s : %d원 | 재고 : %d개", i,  product.prodName, product.prodPrice, product.prodQuantity);
+                System.out.printf("[%d] [%s] %s : %d원 | 재고 : %d개", i, product.shopName, product.prodName, product.prodPrice, product.prodQuantity);
             }
         }
         if (!hasProduct) {
@@ -163,24 +163,37 @@ public class Menu {
         }
     }
     public void addToCart(Scanner scanner, Product product) {
+
+        if (product.prodQuantity == 0) {
+            System.out.println();
+            System.out.println("해당 상품은 품절되었습니다.");
+            System.out.println();
+            return;
+        }
+
         while (true) {
+            System.out.println("############## q: 나가기 ###############");
             System.out.printf("몇 개 구매하시겠습니까? (%s의 재고: %d개): ", product.prodName, product.prodQuantity);
             String input = scanner.nextLine();
-            long quantity;
+            long userQty = 0;
+
+            if (input.equals("q")) {
+                return;
+            }
 
             try {
-                quantity = Long.parseLong(input);
+                userQty = Long.parseLong(input);
             } catch (NumberFormatException e) {
                 System.out.println("유효하지 않은 숫자입니다. 정수만 입력해주세요!");
                 continue;
             }
 
-            if (quantity <= 0 || quantity > product.prodQuantity) {
+            if (userQty > product.prodQuantity || userQty <= 0) {
                 System.out.println("재고량을 초과했거나 유효하지 않은 숫자를 입력하셨습니다!");
                 continue;
             }
 
-            this.cart.addCart(product, quantity);
+            this.cart.addCart(product, userQty);
             this.cart.calcTotalPrice();
             System.out.printf("총 금액: %d\n", cart.totalPrice);
             break;
@@ -211,6 +224,7 @@ public class Menu {
         String userId = this.currentUser.userId;
         String shopId = "";
 
+        // 해당 제품의 상점 식별하기
         for (int i = 0; i < this.cart.products.length; i++) {
             if (this.cart.products[i] == null) break;
             shopId = this.cart.products[i].shopId;

@@ -6,10 +6,15 @@ public class Cart {
 
     public void addCart(Product product, long quantity) {
         for (int i = 0; i < products.length; i++) {
+            // 상품의 ID가 동일하면 장바구니에 새로운 객체를 추가하지 않고 기존 객체의 수량값만 증가
+            if (products[i] != null && products[i].PROD_ID.equals(product.PROD_ID)) {
+                this.quantity[i] += quantity;
+                return;
+            }
             if (products[i] == null) {
                 products[i] = product;
                 this.quantity[i] = quantity;
-                break;
+                return;
             }
         }
     }
@@ -20,7 +25,7 @@ public class Cart {
             if (products[i] != null) {
                 totalPrice += products[i].prodPrice * quantity[i];
             } else {
-                break;
+                return;
             }
         }
     }

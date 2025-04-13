@@ -236,17 +236,6 @@ public class DataBase {
             }
         }
 
-        public Order findOrder(String orderId) {
-            Order targetOrder = null;
-            for (int i = 0; i < dbIdx; i++) {
-                if (db[i].orderId.equals(orderId)) {
-                    targetOrder = db[i];
-                }
-            }
-
-            return targetOrder;
-        }
-
         public boolean isProductInAnyOrder(String prodId) {
             for (int i = 0; i < dbIdx; i++) {
                 Order order = db[i];
