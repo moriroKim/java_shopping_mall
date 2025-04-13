@@ -102,7 +102,7 @@ public class Menu {
             Product product = this.prodDB.db[i];
             if (product != null) {
                 hasProduct = true;
-                System.out.println(product.prodName + " : " + product.prodPrice + "원");
+                System.out.printf("[%d] %s : %d원 | 재고 : %d개", i,  product.prodName, product.prodPrice, product.prodQuantity);
             }
         }
         if (!hasProduct) {
@@ -118,8 +118,8 @@ public class Menu {
         for (int i = 0; i < this.prodDB.db.length; i++) {
             Product product = this.prodDB.db[i];
             if (product != null && product.prodName.equals(targetItem)) {
-                System.out.println(product.toString());
                 found = true;
+                System.out.printf("[%d] %s : %d원 | 재고 : %d개", i,  product.prodName, product.prodPrice, product.prodQuantity);
                 break;
             }
         }
@@ -191,7 +191,8 @@ public class Menu {
         for (int i = 0; i < this.cart.products.length; i++) {
             Product p = this.cart.products[i];
             if (p == null) break;
-            System.out.println("#" + p.prodName + " : " + p.prodPrice + "#");
+            long eachTotalPrice = p.prodPrice * p.prodQuantity;
+            System.out.printf("[%d] %s : %d원 X %d개 ---> 총 %d원", i + 1, p.prodName, p.prodPrice, p.prodQuantity, eachTotalPrice);
         }
         this.cart.calcTotalPrice();
         System.out.printf("총 가격 %d\n", this.cart.totalPrice);

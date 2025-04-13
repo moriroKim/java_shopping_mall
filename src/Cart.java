@@ -31,7 +31,4 @@ public class Cart {
         this.totalPrice = 0;
     }
 
-    public long[] getQuantity() {
-        return this.quantity;
-    }
 }
