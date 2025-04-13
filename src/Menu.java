@@ -20,14 +20,14 @@ public class Menu {
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
-            System.out.println("############# 커맨드 메뉴 ############");
-            System.out.println();
-            System.out.println("###### 1 : 전체 상품보기 | 2 : 상품 검색 | 3 : 장바구니에 담기 | q : 로그아웃 ######");
-            System.out.println();
-            System.out.print("###### 명령어를 입력해주세요: ");
+            Printer.printLine("############# 커맨드 메뉴 ############");
+            Printer.printLine("");
+            Printer.printLine("###### 1 : 전체 상품보기 | 2 : 상품 검색 | 3 : 장바구니에 담기 | q : 로그아웃 ######");
+            Printer.printLine("");
+            Printer.prompt("###### 명령어를 입력해주세요: ");
             String command = scanner.nextLine();
-            System.out.println("#####################################");
-            System.out.println();
+            Printer.printLine("#####################################");
+            Printer.printLine("");
 
             switch (command) {
                 case "1":
@@ -40,26 +40,27 @@ public class Menu {
                     handleCart(scanner);
                     break;
                 case "q":
-                    System.out.println("로그아웃 합니다.");
+                    Printer.printLine("로그아웃 합니다.");
                     this.currentUser = null;
                     return;
                 default:
-                    System.out.println("올바르지 않은 명령어입니다.");
+                    Printer.printLine("올바르지 않은 명령어입니다.");
             }
         }
     }
+
     public void showSellerMenu(User user) {
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
-            System.out.println("####### 판매자 메뉴 #######");
-            System.out.println("1. 상품조회");
-            System.out.println("2. 상품등록");
-            System.out.println("3. 상품수정");
-            System.out.println("4. 상품삭제");
-            System.out.println("5. 주문조회");
-            System.out.println("6. 로그아웃");
-            System.out.print("입력: ");
+            Printer.printLine("####### 판매자 메뉴 #######");
+            Printer.printLine("1. 상품조회");
+            Printer.printLine("2. 상품등록");
+            Printer.printLine("3. 상품수정");
+            Printer.printLine("4. 상품삭제");
+            Printer.printLine("5. 주문조회");
+            Printer.printLine("6. 로그아웃");
+            Printer.prompt("입력: ");
             String input = scanner.nextLine();
 
             switch (input) {
@@ -76,7 +77,7 @@ public class Menu {
                     break;
                 case "4":
                     prodDB.showByOwner(currentShop.ownerId);
-                    System.out.print("삭제할 상품 ID를 입력하세요: ");
+                    Printer.prompt("삭제할 상품 ID를 입력하세요: ");
                     String targetId = scanner.nextLine();
                     this.prodDB.deleteByOwner(targetId);
                     break;
@@ -84,15 +85,20 @@ public class Menu {
                     if (this.orderDB.db != null) {
                         this.orderDB.showOrdersByShop(currentShop.shopId); // shopId를 currentShop에서 가져옴
                     } else {
-                        System.out.println("주문 건이 0건 입니다.");
+                        Printer.printLine("주문 건이 0건 입니다.");
                     }
                     break;
                 case "6":
-                    System.out.println("로그아웃합니다.");
+                    Printer.printLine("로그아웃합니다.");
                     this.currentUser = null;
                     return;
             }
         }
+    }
+
+    // 출력문 반복되는 코드 줄이기
+    public void printProdInfo(Product product, int idx) {
+        Printer.print("[%d] [%s] %s : %d원 | 재고 : %d개", idx, product.shopName, product.prodName, product.prodPrice, product.prodQuantity);
     }
 
     // 메서드들
@@ -102,16 +108,17 @@ public class Menu {
             Product product = this.prodDB.db[i];
             if (product != null) {
                 hasProduct = true;
-                System.out.printf("[%d] [%s] %s : %d원 | 재고 : %d개", i, product.shopName, product.prodName, product.prodPrice, product.prodQuantity);
+                printProdInfo(product, i);
             }
         }
         if (!hasProduct) {
-            System.out.println("현재 품목이 없습니다!");
+            Printer.printLine("현재 품목이 없습니다!");
         }
-        System.out.println();
+        Printer.printLine("");
     }
+
     public void searchProduct(Scanner scanner) {
-        System.out.print("검색하실 상품명을 입력해주세요: ");
+        Printer.prompt("검색하실 상품명을 입력해주세요: ");
         String targetItem = scanner.nextLine();
         boolean found = false;
 
@@ -119,23 +126,24 @@ public class Menu {
             Product product = this.prodDB.db[i];
             if (product != null && product.prodName.equals(targetItem)) {
                 found = true;
-                System.out.printf("[%d] %s : %d원 | 재고 : %d개", i,  product.prodName, product.prodPrice, product.prodQuantity);
+                printProdInfo(product, i);
                 break;
             }
         }
 
         if (!found) {
-            System.out.println("해당 상품명은 상점에 존재하지 않습니다!");
+            Printer.printLine("해당 상품명은 상점에 존재하지 않습니다!");
         }
     }
+
     public void handleCart(Scanner scanner) {
-        System.out.println("########### 장바구니 페이지 ##########");
-        System.out.println("q: 나가기 / s: 장바구니 품목 구매하기 / r: 장바구니 비우기");
+        Printer.printLine("########### 장바구니 페이지 ##########");
+        Printer.printLine("q: 나가기 / s: 장바구니 품목 구매하기 / r: 장바구니 비우기");
 
         showAllProducts();
 
         while (true) {
-            System.out.print("장바구니에 담을 상품 이름을 입력해주세요: ");
+            Printer.prompt("장바구니에 담을 상품 이름을 입력해주세요: ");
             String input = scanner.nextLine();
 
             switch (input) {
@@ -143,11 +151,11 @@ public class Menu {
                     return;
                 case "r":
                     this.cart.empty();
-                    System.out.println("장바구니를 비웠습니다.");
+                    Printer.printLine("장바구니를 비웠습니다.");
                     continue;
                 case "s":
                     if (this.cart.products[0] == null) {
-                        System.out.println("장바구니가 텅 비었습니다!");
+                        Printer.printLine("장바구니가 텅 비었습니다!");
                         continue;
                     }
                     proceedToPurchase(scanner);
@@ -155,25 +163,25 @@ public class Menu {
                 default:
                     Product foundItem = findProductByName(input);
                     if (foundItem == null) {
-                        System.out.println("해당 상품명은 상점에 존재하지 않습니다!");
+                        Printer.printLine("해당 상품명은 상점에 존재하지 않습니다!");
                         continue;
                     }
                     addToCart(scanner, foundItem);
             }
         }
     }
-    public void addToCart(Scanner scanner, Product product) {
 
+    public void addToCart(Scanner scanner, Product product) {
         if (product.prodQuantity == 0) {
-            System.out.println();
-            System.out.println("해당 상품은 품절되었습니다.");
-            System.out.println();
+            Printer.printLine("");
+            Printer.printLine("해당 상품은 품절되었습니다.");
+            Printer.printLine("");
             return;
         }
 
         while (true) {
-            System.out.println("############## q: 나가기 ###############");
-            System.out.printf("몇 개 구매하시겠습니까? (%s의 재고: %d개): ", product.prodName, product.prodQuantity);
+            Printer.printLine("############## q: 나가기 ###############");
+            Printer.printFormat("몇 개 구매하시겠습니까? (%s의 재고: %d개): ", product.prodName, product.prodQuantity);
             String input = scanner.nextLine();
             long userQty = 0;
 
@@ -184,41 +192,42 @@ public class Menu {
             try {
                 userQty = Long.parseLong(input);
             } catch (NumberFormatException e) {
-                System.out.println("유효하지 않은 숫자입니다. 정수만 입력해주세요!");
+                Printer.printLine("유효하지 않은 숫자입니다. 정수만 입력해주세요!");
                 continue;
             }
 
             if (userQty > product.prodQuantity || userQty <= 0) {
-                System.out.println("재고량을 초과했거나 유효하지 않은 숫자를 입력하셨습니다!");
+                Printer.printLine("재고량을 초과했거나 유효하지 않은 숫자를 입력하셨습니다!");
                 continue;
             }
 
             this.cart.addCart(product, userQty);
             this.cart.calcTotalPrice();
-            System.out.printf("총 금액: %d\n", cart.totalPrice);
+            Printer.printFormat("총 금액: %d\n", cart.totalPrice);
             break;
         }
     }
+
     public void proceedToPurchase(Scanner scanner) {
-        System.out.println("######### 선택하신 품목 #########");
+        Printer.printLine("######### 선택하신 품목 #########");
         for (int i = 0; i < this.cart.products.length; i++) {
             Product p = this.cart.products[i];
             if (p == null) break;
             long eachTotalPrice = p.prodPrice * p.prodQuantity;
-            System.out.printf("[%d] %s : %d원 X %d개 ---> 총 %d원", i + 1, p.prodName, p.prodPrice, p.prodQuantity, eachTotalPrice);
+            Printer.printFormat("[%d] %s : %d원 X %d개 ---> 총 %d원", i + 1, p.prodName, p.prodPrice, p.prodQuantity, eachTotalPrice);
         }
         this.cart.calcTotalPrice();
-        System.out.printf("총 가격 %d\n", this.cart.totalPrice);
+        Printer.printFormat("총 가격 %d\n", this.cart.totalPrice);
 
-        System.out.print("정말 구매하시겠습니까? (y/n): ");
+        Printer.prompt("정말 구매하시겠습니까? (y/n): ");
         String input = scanner.nextLine();
 
         if (!input.equals("y")) return;
 
-        System.out.print("주소지를 입력해주세요: ");
+        Printer.prompt("주소지를 입력해주세요: ");
         String address = scanner.nextLine();
 
-        System.out.print("전화번호를 입력해주세요: ");
+        Printer.prompt("전화번호를 입력해주세요: ");
         String phoneNum = scanner.nextLine();
 
         String userId = this.currentUser.userId;
@@ -234,10 +243,10 @@ public class Menu {
         this.orderDB.addOrder(newOrder);
 
         updateProductStocks(newOrder);
-        System.out.println("[✅] 구매가 완료되었습니다!");
+        Printer.printLine("[✅] 구매가 완료되었습니다!");
         newOrder.show();
-
     }
+
     public void updateProductStocks(Order order) {
         Product[] products = order.cart.products;
         long[] qtyArr = order.cart.quantity;
@@ -251,6 +260,7 @@ public class Menu {
             this.prodDB.sinkDB(prodId, "quantity", newQty);
         }
     }
+
     public Product findProductByName(String name) {
         for (int i = 0; i < this.prodDB.db.length; i++) {
             Product product = this.prodDB.db[i];
@@ -260,5 +270,4 @@ public class Menu {
         }
         return null;
     }
-
 }

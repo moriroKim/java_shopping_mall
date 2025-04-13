@@ -5,7 +5,7 @@ public class App {
     DataBase db;
     User user;
     Scanner scanner = new Scanner(System.in);
-    Menu menu; // menu는 currentUser가 로그인 후 생성됨
+    Menu menu;
 
     App(DataBase db) {
         this.db = db;
@@ -14,45 +14,51 @@ public class App {
 
     public void run() {
         while (true) {
-            System.out.println("##### 쇼핑몰에 오신것을 환영합니다! #####");
-            System.out.println();
-            System.out.println("1: 로그인 / 2: 회원가입 / q: 접속종료");
+            Printer.printLine("\n" +
+                    "┌────────────────────────────────────┐\n" +
+                    "│   🛍️  Welcome to Shopping Mall     │\n" +
+                    "└────────────────────────────────────┘");
+            Printer.printLine(""); // 빈 줄 출력
+            Printer.printLine("1️⃣  로그인");
+            Printer.printLine("2️⃣  회원가입");
+            Printer.printLine("❌  q: 접속 종료");
+            Printer.prompt("\n👉 선택: ");
+
             String tempStr = scanner.nextLine();
 
             if (tempStr.equals("q")) {
-                System.out.println("접속을 종료합니다.");
+                Printer.printLine("\n👋 접속을 종료합니다. 다음에 또 만나요!");
                 return;
             }
 
-            // 로그인 페이지
-            if (tempStr.equals("1")) {
-                currentUser = user.SignIn();
-
-                if (currentUser != null) {
-                    menu = new Menu(db.productDB, db.shopDB, db.orderDB, currentUser);
-                    if (currentUser.userType.equals("2")) {
-                        menu.showSellerMenu(currentUser);
-                    } else {
-                        menu.showUserMenu(currentUser);
+            switch (tempStr) {
+                case "1":
+                    currentUser = user.SignIn();
+                    if (currentUser != null) {
+                        showMenu(currentUser);
                     }
-                } else {
-                    continue;
-                }
-            }
+                    break;
 
-            // 회원가입 페이지 => 로그인 페이지
-            if (tempStr.equals("2")) {
-                user.SignUp();
-                currentUser = user.SignIn();
-                if (currentUser != null) {
-                    menu = new Menu(db.productDB, db.shopDB, db.orderDB, currentUser);
-                    if (currentUser.userType.equals("2")) {
-                        menu.showSellerMenu(currentUser);
-                    } else {
-                        menu.showUserMenu(currentUser);
+                case "2":
+                    user.SignUp();
+                    currentUser = user.SignIn();
+                    if (currentUser != null) {
+                        showMenu(currentUser);
                     }
-                }
+                    break;
+
+                default:
+                    Printer.printLine("\n🚫 올바른 메뉴를 선택해주세요.\n");
             }
+        }
+    }
+
+    private void showMenu(User user) {
+        menu = new Menu(db.productDB, db.shopDB, db.orderDB, user);
+        if (user.userType.equals("2")) {
+            menu.showSellerMenu(user);
+        } else {
+            menu.showUserMenu(user);
         }
     }
 }
