@@ -94,7 +94,7 @@ public class Menu {
                         Printer.error("주문 건이 없습니다!");
                     }
                     break;
-                case "q":
+                case "6":
                     Printer.customMsg(icons[3],"로그아웃 합니다.");
                     this.currentUser = null;
                     return;

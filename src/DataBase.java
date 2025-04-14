@@ -111,7 +111,7 @@ public class DataBase {
                         String[] editOptions = {"상품명 수정", "가격 수정", "수량 수정"};
 
                         Printer.customMsg(editStatus, isEdited ? "수정됨" : "");
-                        Printer.printProduct(p, targetIdx);
+                        Printer.printProduct(p, targetIdx + 1);
                         Printer.printOptions(null, editOptions, false);
 
                         Printer.select("선택");
